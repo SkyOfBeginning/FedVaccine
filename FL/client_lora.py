@@ -53,7 +53,7 @@ class Client_LoRA(object):
 
         # you can use class-wise pyramidDataset or just task-wise pyramidDataset
         # self.distill_data = PyramidDataset_Class_Wise(3)
-        self.distill_data =PyramidDataset_Task_Wise(2)
+        self.distill_data =PyramidDataset_Task_Wise(3)
         self.criterion = torch.nn.CrossEntropyLoss().to('cuda')
         self.optimizer = torch.optim.Adam(self.local_model.parameters(), lr=0.001, weight_decay=1e-03)
         self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=self.local_epoch)
@@ -106,8 +106,8 @@ class Client_LoRA(object):
                 self.scheduler.step()
 
         self.local_model.decompose_sig_value(self.task_id)
-        if self.task_id == 0:
-            self.distillation(self.task_id)
+
+        self.distillation(self.task_id)
         self.local_model.save_heads()
         self.evaluate(self.task_id)
 
@@ -119,10 +119,8 @@ class Client_LoRA(object):
 
             print('---------------------------------------------------------------')
 
-            # for i in range(self.task_id):
-            #     self.recall(i)
-
-            self.recall(0)
+            for i in range(self.task_id):
+                self.recall(i)
 
 
             print('#####################################')

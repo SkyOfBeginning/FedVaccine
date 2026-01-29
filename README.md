@@ -39,6 +39,21 @@ python fl_main.py
 In fl_main.py, you can switch dataset by cifar100_Data_Spliter(5, 5, 15, 224).random_split() or ImagenetR_spliter(5, 5, 40, 224).random_split()
 
 
+If the cuda memory is over-flowing or the speed is too slow, please lower the value on Line 211 in utils_data.py:
+```angular2html
+x_syn = syn_augmentor(torch.cat([x_syn for a in range(10)]))
+
+# if GPU memory is over-flowing, reduce num(10) to num(2)
+y_syn = torch.cat([y_syn for a in range(10)])
+```
+
+The default method is task-wise vaccine generation, you can change it into class-wise  vaccine generation in client_lora.py
+```angular2html
+# you can use class-wise pyramidDataset or just task-wise pyramidDataset
+# self.distill_data = PyramidDataset_Class_Wise(3)
+self.distill_data =PyramidDataset_Task_Wise(3)
+```
+
 
 
 

@@ -56,7 +56,6 @@ class Server_DF(object):
         for i in range(self.client_num):
             for j in range(self.task_id+1):
                 evaluate_class.extend(self.class_mask[i][j])
-        print(evaluate_class)
 
         temp_train_data = []
         temp_train_label = []
@@ -90,7 +89,6 @@ class Server_DF(object):
                 self.scheduler.step()
 
 
-        self.evaluate_whole(self.task_id)
 
 
     def evaluate_whole(self, task_id):
