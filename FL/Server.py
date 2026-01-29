@@ -32,7 +32,7 @@ class Server_DF(object):
 
     def init_client(self):
         print('Initialize clients')
-        for i in range(0,1):
+        for i in range(0,self.client_num):
             # id,original_model,vit,task_per_global_epoch,subset,local_epoch,batch_size,lr,device,method
             # if i!=4:
             #     continue

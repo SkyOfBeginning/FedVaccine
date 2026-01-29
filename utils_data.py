@@ -208,10 +208,10 @@ def get_syn_grad(x_syn: Tensor, y_syn: Tensor, model: nn.Module, fc: nn.Module) 
     with torch.amp.autocast('cuda', enabled=True):
 
         # augment create augs_per_batch copies of x_syn and apply different aug to each one
-        x_syn = syn_augmentor(torch.cat([x_syn for a in range(10)]))
+        x_syn = syn_augmentor(torch.cat([x_syn for a in range(2)]))
 
         # if GPU memory is over-flowing, reduce num(10) to num(2)
-        y_syn = torch.cat([y_syn for a in range(10)])
+        y_syn = torch.cat([y_syn for a in range(2)])
 
         # (x - mean) / std
         x_syn = (x_syn - torch.tensor(mean, device="cuda").reshape(1, 3, 1, 1)) / torch.tensor(std, device="cuda").reshape(1, 3, 1, 1)
