@@ -32,9 +32,9 @@ original_model = create_model(
     )
 try:
     load_checkpoint(original_model, 'models/pretrain_model/ViT-B_16.npz')
-    print("成功使用 load_checkpoint 加载并转换了 npz 权重。")
+   
 except Exception as e:
-    print(f"尝试使用 load_checkpoint 失败，错误: {e}")
+    print(f"{e}")
 
 
 
