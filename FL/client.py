@@ -25,8 +25,7 @@ class Client_DF(object):
         self.task_id = -1
         self.task_per_global_epoch = task_per_global_epoch
         self.test_loader=[]
-        # subset应该是一个【】，其中包含了num_task个数据以及类别，以[[(类别)：[数据]]，{}]的形式保存
-        self.train_data =subset
+        
         self.local_epoch = local_epoch
         self.batch_size = batch_size
         self.lr = lr
@@ -102,77 +101,18 @@ class Client_DF(object):
         self.distillation(self.task_id)
         self.evaluate(self.task_id)
 
-        ################# tnse 可视化     ##########################
-
-        if self.task_id== 0:
-            self.local_model.eval()
-            ori_features = []
-            ori_labels = []
-
-            with torch.no_grad():
-                for x, y in tqdm(train_loader):
-                    x, y = Variable(x, requires_grad=False).to('cuda', non_blocking=True), y.long().to('cuda', non_blocking=True)
-
-                    # ⚠️ 根据你的模型改这里
-                    # 假设 model(x) 返回 feature, logits
-                    output = self.local_model(x, self.task_id)
-                    feat = output['feat']
-                    # 如果 model(x) 返回的是 (feat, logits)
-
-                    ori_features.append(feat.cpu())
-                    ori_labels.append(y)
-
-            ori_features = torch.cat(ori_features, dim=0).numpy()
-            ori_labels = torch.cat(ori_labels, dim=0).numpy()
-
-            recall_features = []
-            recall_labels = []
-            distill_train_data = self.distill_data.get_by_task(0)
-            train_loader_distill = torch.utils.data.DataLoader(distill_train_data, batch_size=8, shuffle=True)
-            with torch.no_grad():
-                for iteration, (input, target) in enumerate(train_loader_distill):
-                    input, target = Variable(input, requires_grad=False).to('cuda',non_blocking=True), target.long().to('cuda', non_blocking=True)
-
-
-                    output = self.local_model(input, self.task_id)
-                    feat = output['feat']
-                    # 如果 model(x) 返回的是 (feat, logits)
-
-                    recall_features.append(feat.cpu())
-                    recall_labels.append(target)
-
-            recall_features = torch.cat(recall_features, dim=0).numpy()
-            recall_labels = torch.cat(recall_labels, dim=0).numpy()
-
-            tsne = TSNE(n_components=2,perplexity=30,n_iter=1000,random_state=42,init='pca',learning_rate='auto')
-
-            tsne_results = tsne.fit_transform(ori_features)
-            recall_results = tsne.fit(recall_features)
-            plt.figure(figsize=(8, 8))
-            num_classes = len(np.unique(ori_labels))
-
-            for cls in self.class_mask[0]:
-                idx = ori_labels == cls
-                plt.scatter(tsne_results[idx, 0], tsne_results[idx, 1], s=10, label=str(cls), alpha=0.7, marker='o')
-
-            plt.legend(markerscale=2, fontsize=9)
-            plt.xticks([])
-            plt.yticks([])
-            plt.title("t-SNE Visualization of Features")
-            plt.show()
-            plt.savefig('t-SNE Visualization of Features.pdf', dpi=300, bbox_inches='tight')
-
+        
 
 
 
         ###################################################################################################
         if self.task_id > 0:
-            print('回忆前：')
+            print('before recall：')
             for i in range(self.task_id + 1):
                 self.evaluate(i)
 
             print('---------------------------------------------------------------')
-            print('回忆后')
+            print('after recall')
             for i in range(self.task_id + 1):
                 self.recall(i)
 
@@ -318,7 +258,7 @@ class Client_DF(object):
 
         acc = 100 * correct / total
 
-        print(f'客户端{self.id}\t任务{task}的准确率为\t{acc}')
+        print(f'{self.id}\t client's Task {task}: \t{acc}')
 
 
 
